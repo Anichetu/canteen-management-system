@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canteen Management System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="login-page">
+  <div class="login-card">
+    <div class="brand">
+      <h1>🍽 Canteen MS</h1>
+      <p>Canteen Management System</p>
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="login-username" class="form-control" placeholder="Enter username" value="admin">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" class="form-control" placeholder="Enter password" value="admin123">
+    </div>
+    <button class="btn btn-primary btn-lg" id="login-btn" style="width:100%">Login</button>
+    <div id="login-error" class="login-error"></div>
+  </div>
+</div>
+
+<!-- ===================== APP SHELL ===================== -->
+<div id="app-shell" class="app-shell" style="display:none">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <h2>🍽 Canteen MS</h2>
+      <span>Management System</span>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label">Main</div>
+        <div class="nav-item" data-page="dashboard" data-roles="WAITER,KITCHEN_MANAGER,ADMIN">
+          <span class="icon">📊</span><span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="customer-search" data-roles="WAITER,ADMIN">
+          <span class="icon">🔍</span><span>Customer Search</span>
+        </div>
+        <div class="nav-item" data-page="add-customer" data-roles="WAITER,ADMIN">
+          <span class="icon">👤</span><span>Add Customer</span>
+        </div>
+        <div class="nav-item" data-page="order-entry" data-roles="WAITER,ADMIN">
+          <span class="icon">🛒</span><span>Order Entry</span>
+        </div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Operations</div>
+        <div class="nav-item" data-page="orders" data-roles="WAITER,KITCHEN_MANAGER,ADMIN">
+          <span class="icon">📋</span><span>Active Orders</span>
+        </div>
+        <div class="nav-item" data-page="kitchen" data-roles="KITCHEN_MANAGER,ADMIN">
+          <span class="icon">👨‍🍳</span><span>Kitchen</span>
+        </div>
+        <div class="nav-item" data-page="billing" data-roles="WAITER,ADMIN">
+          <span class="icon">💳</span><span>Billing</span>
+        </div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Admin</div>
+        <div class="nav-item" data-page="reports" data-roles="ADMIN">
+          <span class="icon">📈</span><span>Reports</span>
+        </div>
+        <div class="nav-item" data-page="menu-admin" data-roles="ADMIN">
+          <span class="icon">🍜</span><span>Menu Items</span>
+        </div>
+        <div class="nav-item" data-page="users" data-roles="ADMIN">
+          <span class="icon">👥</span><span>Users</span>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar">A</div>
+      <div class="user-info">
+        <div class="name" id="sidebar-name">Admin</div>
+        <div class="role" id="sidebar-role">ADMIN</div>
+      </div>
+      <div class="logout-btn" id="logout-btn" title="Logout">⏻</div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+    <div class="page" id="page-dashboard">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Live overview — auto-refreshes every 30 seconds</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card orange">
+          <div class="label">Today's Revenue</div>
+          <div class="value" id="dash-revenue">₹0</div>
+          <div class="sub">Closed orders</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="label">Total Orders</div>
+          <div class="value" id="dash-orders">0</div>
+          <div class="sub">Since midnight</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label">Cash Collection</div>
+          <div class="value" id="dash-cash">₹0</div>
+          <div class="sub">Cash payments</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label">GPay / UPI</div>
+          <div class="value" id="dash-upi">₹0</div>
+          <div class="sub">Digital payments</div>
+        </div>
+        <div class="stat-card red">
+          <div class="label">Pending</div>
+          <div class="value" id="dash-pending">₹0</div>
+          <div class="sub">Unpaid balance</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="label">New Customers</div>
+          <div class="value" id="dash-newcust">0</div>
+          <div class="sub">Registered today</div>
+        </div>
+      </div>
+      <div class="card">
+        <p style="color:var(--text2);font-size:13px">💡 Use the sidebar to navigate. Kitchen & Active Orders auto-refresh every 10 seconds. Billing automatically shows outstanding balances.</p>
+      </div>
+    </div>
+
+    <!-- CUSTOMER SEARCH -->
+    <div class="page" id="page-customer-search">
+      <div class="page-header">
+        <h1>Customer Search</h1>
+        <p>Search by name, mobile number, or customer ID</p>
+      </div>
+      <div class="card">
+        <div class="form-group">
+          <label>Search Customer</label>
+          <div class="search-wrap">
+            <input type="text" id="cust-search-input" class="form-control" placeholder="Type name, mobile or CUST-ID...">
+            <div class="dropdown-list" id="cust-dropdown"></div>
+          </div>
+        </div>
+        <div id="selected-customer-info"></div>
+      </div>
+    </div>
+
+    <!-- ADD CUSTOMER -->
+    <div class="page" id="page-add-customer">
+      <div class="page-header">
+        <h1>Add New Customer</h1>
+        <p>Register a new customer in the system</p>
+      </div>
+      <div class="card" style="max-width:480px">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="new-cust-name" class="form-control" placeholder="e.g. Rahul Patil">
+        </div>
+        <div class="form-group">
+          <label>Mobile Number (10 digits)</label>
+          <input type="text" id="new-cust-mobile" class="form-control" placeholder="e.g. 9876543210" maxlength="10">
+        </div>
+        <button class="btn btn-primary btn-lg" id="add-customer-btn">Register Customer</button>
+      </div>
+    </div>
+
+    <!-- ORDER ENTRY -->
+    <div class="page" id="page-order-entry">
+      <div class="page-header">
+        <h1>Order Entry</h1>
+        <p>Add items to the current order</p>
+      </div>
+      <div class="order-layout">
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="form-group" style="margin-bottom:0">
+              <label>Search Menu Items</label>
+              <input type="text" id="menu-search-input" class="form-control" placeholder="Type item name e.g. Paneer...">
+            </div>
+          </div>
+          <div class="menu-grid" id="menu-grid"></div>
+        </div>
+        <div class="order-panel">
+          <h3>🛒 Current Order</h3>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:10px">
+            <span id="order-panel-id">—</span> &nbsp;|&nbsp; <span id="order-panel-customer">—</span>
+          </div>
+          <div class="order-items-list" id="order-items-list"></div>
+          <div class="order-total">
+            <span>Total</span>
+            <span id="order-total">₹0</span>
+          </div>
+          <button class="btn btn-primary btn-lg" id="proceed-billing-btn" style="width:100%;margin-top:12px">Proceed to Billing</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVE ORDERS -->
+    <div class="page" id="page-orders">
+      <div class="page-header">
+        <h1>Active Orders</h1>
+        <p>All pending and in-progress orders — refreshes every 10s</p>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="active-orders-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- KITCHEN -->
+    <div class="page" id="page-kitchen">
+      <div class="page-header">
+        <h1>Kitchen Dashboard</h1>
+        <p>Mark items as completed when ready — refreshes every 10s</p>
+      </div>
+      <div class="kitchen-grid" id="kitchen-grid"></div>
+    </div>
+
+    <!-- BILLING -->
+    <div class="page" id="page-billing">
+      <div class="page-header">
+        <h1>Billing & Payment</h1>
+        <p>Collect payment for the current order</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 380px;gap:20px;max-width:900px">
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <h3 style="margin-bottom:12px">Order Items</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Item</th><th>Qty</th><th style="text-align:right">Amount</th></tr></thead>
+                <tbody id="bill-items-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h3 style="margin-bottom:14px">Payment</h3>
+            <div style="color:var(--text2);font-size:13px;margin-bottom:4px" id="bill-customer-name">—</div>
+            <div style="color:var(--text3);font-size:11px;margin-bottom:14px" id="bill-order-id">—</div>
+            <div class="bill-summary">
+              <div class="bill-row"><span>Current Bill</span><span id="bill-current">₹0</span></div>
+              <div class="bill-row highlight"><span>Previous Pending</span><span id="bill-previous">₹0</span></div>
+              <div class="bill-row total"><span>Total Due</span><span id="bill-total">₹0</span></div>
+            </div>
+            <div class="form-group">
+              <label>Amount Received</label>
+              <input type="number" id="payment-amount" class="form-control" placeholder="0.00">
+            </div>
+            <div class="form-group">
+              <label>Payment Method</label>
+              <select id="payment-method" class="form-control">
+                <option value="CASH">💵 Cash</option>
+                <option value="GPAY_UPI">📱 GPay / UPI</option>
+              </select>
+            </div>
+            <button class="btn btn-success btn-lg" id="pay-btn" style="width:100%">✓ Payment Completed</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="page" id="page-reports">
+      <div class="page-header">
+        <h1>Daily Reports</h1>
+        <p>End-of-day and on-demand analytics</p>
+      </div>
+      <div class="stat-grid" style="margin-bottom:24px">
+        <div class="stat-card orange">
+          <div class="label">Total Sales</div>
+          <div class="value" id="rep-total">₹0</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label">Cash Collection</div>
+          <div class="value" id="rep-cash">₹0</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label">GPay / UPI</div>
+          <div class="value" id="rep-upi">₹0</div>
+        </div>
+        <div class="stat-card red">
+          <div class="label">Pending</div>
+          <div class="value" id="rep-pending">₹0</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="label">Total Orders</div>
+          <div class="value" id="rep-orders">0</div>
+        </div>
+        <div class="stat-card green">
+          <div class="label">Completed</div>
+          <div class="value" id="rep-completed">0</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="label">New Customers</div>
+          <div class="value" id="rep-newcust">0</div>
+        </div>
+        <div class="stat-card red">
+          <div class="label">With Outstanding</div>
+          <div class="value" id="rep-outstanding">0</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:16px">Dish-wise Sales Today</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Dish</th><th>Qty Sold</th></tr></thead>
+            <tbody id="dish-report-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN MENU -->
+    <div class="page" id="page-menu-admin">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <h1>Menu Items</h1>
+          <p>Manage your canteen menu</p>
+        </div>
+        <button class="btn btn-primary" id="add-menu-btn">+ Add Item</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="admin-menu-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="page" id="page-users">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <h1>Users</h1>
+          <p>Manage staff accounts</p>
+        </div>
+        <button class="btn btn-primary" id="add-user-btn">+ Add User</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Username</th><th>Full Name</th><th>Role</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ===================== MODALS ===================== -->
+
+<!-- Qty Modal -->
+<div class="modal-overlay" id="qty-modal">
+  <div class="modal" style="width:320px">
+    <h2>Add Item</h2>
+    <p style="font-weight:700;font-size:16px;margin-bottom:4px" id="qty-modal-name"></p>
+    <p style="color:var(--accent);margin-bottom:20px" id="qty-modal-price"></p>
+    <div class="form-group">
+      <label>Quantity</label>
+      <input type="number" id="qty-input" class="form-control" min="1" value="1">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="qty-cancel-btn">Cancel</button>
+      <button class="btn btn-primary" id="qty-confirm-btn">Add to Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- Menu Item Modal -->
+<div class="modal-overlay" id="menu-modal">
+  <div class="modal">
+    <h2 id="menu-modal-title">Add Menu Item</h2>
+    <input type="hidden" id="menu-form-id">
+    <div class="form-group">
+      <label>Item Name</label>
+      <input type="text" id="menu-form-name" class="form-control" placeholder="e.g. Paneer Masala">
+    </div>
+    <div class="form-group">
+      <label>Price (₹)</label>
+      <input type="number" id="menu-form-price" class="form-control" placeholder="e.g. 180">
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <input type="text" id="menu-form-category" class="form-control" placeholder="e.g. Main Course, Drinks, Bread">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="menu-form-cancel">Cancel</button>
+      <button class="btn btn-primary" id="menu-form-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal">
+    <h2>Add User</h2>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="user-form-username" class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="user-form-password" class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="user-form-fullname" class="form-control">
+    </div>
+    <div class="form-group">
+      <label>Role</label>
+      <select id="user-form-role" class="form-control">
+        <option value="WAITER">Waiter</option>
+        <option value="KITCHEN_MANAGER">Kitchen Manager</option>
+        <option value="ADMIN">Admin</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="user-form-cancel">Cancel</button>
+      <button class="btn btn-primary" id="user-form-save">Create User</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
