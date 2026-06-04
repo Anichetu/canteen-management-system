@@ -1,7 +1,7 @@
 // =====================
 // API Configuration
 // =====================
-const API_BASE = 'https://canteen-management-system.up.railway.app:8080/api';
+const API_BASE = 'https://canteen-management-system.up.railway.app/api';
 
 const API = {
   // Customers
